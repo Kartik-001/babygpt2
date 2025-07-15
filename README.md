@@ -1,10 +1,10 @@
-```markdown
-# BabyGPT2
+# 🍼 BabyGPT2
 
-An end‑to‑end “ChatGPT‑style” demo:  
-- **Train & explore** a miniature GPT‑2 “BabyGPT” in Colab  
-- **Serve** the trained model via a FastAPI + Docker API  
-- **Interact** through a Next.js web chat UI  
+An end-to-end "ChatGPT-style" demo project built from scratch:
+
+- 🧠 **Train & experiment** with a miniature GPT-2 model (`BabyGPT`) using Colab
+- ⚙️ **Serve** the trained model via a FastAPI + Docker API
+- 💬 **Interact** with it through a modern Next.js web chat UI
 
 ---
 
@@ -12,47 +12,45 @@ An end‑to‑end “ChatGPT‑style” demo:
 
 ```
 
-baby gpt2/
+baby-gpt2/
 ├── babygpt2/
-│   └── baby gpt-2.ipynb             ← Notebook for training & experimentation
+│   └── baby gpt-2.ipynb           # Notebook to train and test the model
 │
 ├── babygpt2-api/
 │   ├── app/
-│   │   ├── main.py                  ← FastAPI app (+ CORS & health‑check)
-│   │   ├── model.py                 ← load model & `generate_response()`
-│   │   └── model\_architecture.py    ← GPT2Model definition
-│   │
-│   ├── babygpt2\_model\_final.pt      ← Saved PyTorch model weights
-│   ├── Dockerfile                   ← Build instructions for the API
-│   └── requirements.txt             ← fastapi, uvicorn, torch, tiktoken
+│   │   ├── main.py                # FastAPI app with CORS and health check
+│   │   ├── model.py               # Model loading and response generation
+│   │   └── model\_architecture.py  # GPT2Model class definition
+│   ├── babygpt2\_model\_final.pt    # Trained model weights (PyTorch)
+│   ├── Dockerfile                 # Docker build file for the API
+│   └── requirements.txt           # fastapi, uvicorn, torch, tiktoken
 │
 ├── babygpt2-web/
 │   ├── pages/
-│   │   └── index.js                 ← Next.js chat UI (axios → `/generate`)
-│   ├── package.json                 ← next, react, axios, etc.
-│   └── …                            ← other Next.js config (public/, styles/, etc.)
+│   │   └── index.js               # Frontend UI with prompt + axios calls
+│   ├── package.json               # Next.js, React, and frontend deps
+│   └── ...                        # Other frontend assets and config
 │
-└── README.md                        ← You are here
+└── README.md                      # This file
 
 ````
 
 ---
 
-## 📦 What’s Inside
+## 📦 What's Inside
 
-1. **`babygpt2/`**  
-   - A Colab notebook to **train** or fine‑tune your BabyGPT model on a small dataset.
+### 1. `babygpt2/`
+- A Jupyter notebook (`.ipynb`) for training the BabyGPT model from scratch or fine-tuning on custom data.
 
-2. **`babygpt2-api/`**  
-   - **Inference server** powered by FastAPI.  
-   - **Tokenizes** inputs with `tiktoken.get_encoding("gpt2")`.  
-   - **Generates** text with your saved `babygpt2_model_final.pt`.  
-   - **Dockerized** for easy deployment.
+### 2. `babygpt2-api/`
+- FastAPI server that loads and serves the trained model.
+- Accepts prompts via `/generate` and returns model responses.
+- Docker-ready for deployment on services like Render, Railway, or Heroku.
 
-3. **`babygpt2-web/`**  
-   - **Next.js** front‑end that renders a chat box.  
-   - **Calls** your `/generate` API endpoint and displays responses.  
-   - Ready to deploy on Vercel, Netlify, or any static host.
+### 3. `babygpt2-web/`
+- A modern web-based chat interface built with Next.js and React.
+- Connects to the API using `axios` to send user prompts and render model responses.
+- Can be deployed using Vercel, Netlify, or any frontend host.
 
 ---
 
@@ -66,34 +64,44 @@ pip install -r requirements.txt
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ````
 
-* **Docs**: [http://localhost:8000/docs](http://localhost:8000/docs)
-* **Health‑check**: [http://localhost:8000/](http://localhost:8000/)
-* **Generate**: `POST /generate` with JSON
+* Swagger Docs: [http://localhost:8000/docs](http://localhost:8000/docs)
+* Health Check: [http://localhost:8000/](http://localhost:8000/)
+* Test Generation:
 
-  ```json
-  { "prompt": "Hello, world!", "max_new_tokens": 50 }
-  ```
+```json
+POST /generate
+{
+  "prompt": "Once upon a time",
+  "max_new_tokens": 50
+}
+```
 
 ---
 
-### 2. Dockerize & Deploy
+### 2. Dockerize & Deploy the API
 
 ```bash
 cd babygpt2-api
-# Build
+
+# Build Docker image
 docker build -t yourhubuser/babygpt2-api:latest .
+
 # Run locally
 docker run --rm -d -p 8000:8000 babygpt2-api:latest
-# Push to Docker Hub
+
+# Push to DockerHub (optional)
 docker tag babygpt2-api:latest yourhubuser/babygpt2-api:latest
 docker push yourhubuser/babygpt2-api:latest
 ```
 
-Then connect `yourhubuser/babygpt2-api:latest` to **Render.com** (free Docker service) or any container host.
+You can then deploy this container on:
+
+* 🔁 [Render.com](https://render.com) (Free container service)
+* 📦 Railway, Heroku, Fly.io, etc.
 
 ---
 
-### 3. Run the Front‑End
+### 3. Run the Frontend Locally
 
 ```bash
 cd babygpt2-web
@@ -101,9 +109,11 @@ npm install
 npm run dev
 ```
 
-Visit [http://localhost:3000](http://localhost:3000), type a prompt, and click **Generate** to see BabyGPT’s reply.
+Visit: [http://localhost:3000](http://localhost:3000)
 
-To deploy, use Vercel:
+---
+
+### 4. Deploy the Web UI
 
 ```bash
 cd babygpt2-web
@@ -111,26 +121,50 @@ vercel login
 vercel --prod
 ```
 
+You can also use Netlify, Surge, or any static frontend hosting.
+
 ---
 
 ## 🌐 Custom Domains & HTTPS
 
-* **API**: add `api.yourdomain.com` in Render → set CNAME → auto‑SSL
-* **UI**: add `yourdomain.com` in Vercel → set CNAME → auto‑SSL
+These steps are for **users deploying their own version**:
+
+* **API**: Add `api.yourdomain.com` to Render, point DNS, and enable auto‑SSL
+* **Web UI**: Add `yourdomain.com` to Vercel/Netlify and connect DNS
 
 ---
 
 ## 🤝 Contributing
 
-1. Fork this repo
-2. Create a branch: `git checkout -b feat/your-feature`
-3. Commit & push: `git push origin feat/your-feature`
+Feel free to contribute and improve the project!
+
+1. Fork [this repository](https://github.com/Kartik-001/babygpt2)
+2. Create a feature branch:
+
+   ```bash
+   git checkout -b feat/your-feature
+   ```
+3. Commit and push:
+
+   ```bash
+   git push origin feat/your-feature
+   ```
 4. Open a Pull Request
 
 ---
 
 ## 📄 License
 
-This project is released under the **MIT License**. Feel free to use, modify, and extend!
+This project is licensed under the **MIT License** — meaning you're free to use, copy, modify, and distribute it for personal or commercial use. Just don’t hold me liable if it breaks 😉
+
+---
+
+## 🙌 Acknowledgements
+
+Inspired by:
+
+* GPT-2 architecture from OpenAI
+* FastAPI + Docker for backend deployment
+* Next.js for rapid frontend UI development
 
 ---
