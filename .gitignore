@@ -1,0 +1,21 @@
+.vercel
+
+# Python
+__pycache__/
+*.py[cod]
+*.env
+
+# Node
+node_modules/
+
+# VSCode
+.vscode/
+
+# Docker
+Dockerfile
+
+# Model weights (optional—use LFS or Releases for large files)
+babygpt2-api/babygpt2_model_final.pt
+
+# Misc
+*.log
