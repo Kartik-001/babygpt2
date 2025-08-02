@@ -2,7 +2,7 @@
 import streamlit as st
 import requests
 
-# Page config
+# Page setup
 st.set_page_config(page_title="BabyGPT2 Chat", page_icon="🤖")
 st.title("🤖 BabyGPT2 Chat")
 st.markdown("""
@@ -10,15 +10,30 @@ Enter a prompt below and either **press Enter** or click **Generate**.
 Your text will be sent to the BabyGPT2 API and its continuation will appear below.
 """)
 
-# Placeholder for output below the form
-output_placeholder = st.empty()
+# 1) Prompt input (single-line, captures Enter)
+st.text_input(
+    "Your prompt", 
+    key="prompt", 
+    on_change=lambda: st.session_state.generate_clicks.append("enter")
+)
 
-# Define the generation function
-def do_generate(prompt: str):
-    with output_placeholder:
-        if not prompt.strip():
-            st.warning("Please enter a prompt first.")
-            return
+# 2) Generate button (captures clicks)
+if st.button("Generate"):
+    st.session_state.generate_clicks.append("button")
+
+# Initialize a list in session_state to track submissions
+if "generate_clicks" not in st.session_state:
+    st.session_state.generate_clicks = []
+
+# 3) Placeholder _after_ the input & button
+result_placeholder = st.empty()
+
+# 4) Generation logic
+def generate(prompt: str):
+    if not prompt.strip():
+        result_placeholder.warning("Please enter a prompt first.")
+        return
+    with result_placeholder:
         with st.spinner("Generating..."):
             resp = requests.post(
                 "https://babygpt2-api.onrender.com/generate",
@@ -29,14 +44,8 @@ def do_generate(prompt: str):
         st.subheader("🖋️ Generated Text")
         st.write(text)
 
-# ▪️ FORM: wraps the input and submit button
-with st.form(key="prompt_form"):
-    user_input = st.text_input(
-        "Your prompt (press Enter to send)", 
-        key="prompt_input"
-    )
-    submit_btn = st.form_submit_button("Generate")
-
-# After the form block, check if submitted
-if submit_btn:
-    do_generate(user_input)
+# 5) If either Enter or Button was used, run generation
+if st.session_state.generate_clicks:
+    # pop so we only handle once
+    st.session_state.generate_clicks.pop()
+    generate(st.session_state.prompt)
