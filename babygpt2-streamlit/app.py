@@ -2,43 +2,47 @@
 import streamlit as st
 import requests
 
-# Title
+# 1️⃣ Page config and title
 st.set_page_config(page_title="BabyGPT2 Chat", page_icon="🤖")
 st.title("🤖 BabyGPT2 Chat")
 
-# Instructions
 st.markdown(
     """
-Enter a prompt below and click **Generate**.  
-Your text will be sent to the BabyGPT2 API and returned as generated continuation.
+Enter a prompt below and either **press Enter** or click **Generate**.  
+Your text will be sent to the BabyGPT2 API and the generated continuation will appear below.
 """
 )
 
-# Text input box
-prompt = st.text_area("Your prompt", height=150)
-
-# Generate button
-if st.button("Generate"):
+# 2️⃣ Define the generate-text callback
+def generate():
+    prompt = st.session_state.prompt  # get the current prompt
     if not prompt.strip():
         st.warning("Please enter a prompt first.")
-    else:
-        # Show spinner while waiting for response
-        with st.spinner("Generating..."):
-            try:
-                # Call your hosted FastAPI endpoint
-                resp = requests.post(
-                    "https://babygpt2-api.onrender.com/generate",
-                    headers={"Content-Type": "application/json"},
-                    json={"prompt": prompt}
-                )
-                resp.raise_for_status()
-                data = resp.json()
-                generated = data.get("text", "")
-            except Exception as e:
-                st.error(f"API error: {e}")
-                generated = ""
+        return
 
-        # Display the result
-        if generated:
-            st.subheader("🖋️ Generated Text")
-            st.write(generated)
+    with st.spinner("Generating..."):
+        try:
+            resp = requests.post(
+                "https://babygpt2-api.onrender.com/generate",
+                json={"prompt": prompt}
+            )
+            resp.raise_for_status()
+            st.session_state.generated = resp.json().get("text", "")
+        except Exception as e:
+            st.session_state.generated = f"API error: {e}"
+
+# 3️⃣ Input box that submits on Enter
+st.text_input(
+    "Your prompt (press Enter to send)", 
+    key="prompt",              # stored in st.session_state.prompt
+    on_change=generate         # called when Enter is pressed
+)
+
+# 4️⃣ Also show a Generate button
+if st.button("Generate"):
+    generate()
+
+# 5️⃣ Display the generated text (if any)
+if "generated" in st.session_state:
+    st.subheader("🖋️ Generated Text")
+    st.write(st.session_state.generated)
