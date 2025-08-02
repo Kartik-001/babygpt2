@@ -31,14 +31,17 @@ def generate():
         except Exception as e:
             st.session_state.generated = f"API error: {e}"
 
-# 3️⃣ Input box that submits on Enter
+# Placeholder for spinner + results, placed exactly where YOU want them:
+result_placeholder = st.container()
+
+# Text input (with on_change callback)
 st.text_input(
-    "Your prompt (press Enter to send)", 
-    key="prompt",              # stored in st.session_state.prompt
-    on_change=generate         # called when Enter is pressed
+    "Your prompt (press Enter to send)",
+    key="prompt",
+    on_change=generate
 )
 
-# 4️⃣ Also show a Generate button
+# Generate button
 if st.button("Generate"):
     generate()
 
