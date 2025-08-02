@@ -2,50 +2,47 @@
 import streamlit as st
 import requests
 
-# 1️⃣ Page config and title
+# 0️⃣ Page setup
 st.set_page_config(page_title="BabyGPT2 Chat", page_icon="🤖")
 st.title("🤖 BabyGPT2 Chat")
-
-st.markdown(
-    """
+st.markdown("""
 Enter a prompt below and either **press Enter** or click **Generate**.  
-Your text will be sent to the BabyGPT2 API and the generated continuation will appear below.
-"""
-)
+Your text will be sent to the BabyGPT2 API and its continuation will appear below.
+""")
 
-# 2️⃣ Define the generate-text callback
+# 1️⃣ Create a placeholder where both Enter and Button will render output
+result_placeholder = st.empty()
+
+# 2️⃣ Define the generate callback to write into that placeholder
 def generate():
-    prompt = st.session_state.prompt  # get the current prompt
-    if not prompt.strip():
-        st.warning("Please enter a prompt first.")
+    prompt = st.session_state.prompt.strip()
+    if not prompt:
+        # clear any previous content and show a warning
+        result_placeholder.empty()
+        result_placeholder.warning("Please enter a prompt first.")
         return
 
-    with st.spinner("Generating..."):
-        try:
+    # everything below runs inside the placeholder
+    with result_placeholder:
+        with st.spinner("Generating..."):
             resp = requests.post(
                 "https://babygpt2-api.onrender.com/generate",
                 json={"prompt": prompt}
             )
             resp.raise_for_status()
-            st.session_state.generated = resp.json().get("text", "")
-        except Exception as e:
-            st.session_state.generated = f"API error: {e}"
+            text = resp.json().get("text", "")
 
-# Placeholder for spinner + results, placed exactly where YOU want them:
-result_placeholder = st.container()
+        # display result in the same spot
+        st.subheader("🖋️ Generated Text")
+        st.write(text)
 
-# Text input (with on_change callback)
+# 3️⃣ Single-line input that fires on Enter
 st.text_input(
     "Your prompt (press Enter to send)",
     key="prompt",
     on_change=generate
 )
 
-# Generate button
+# 4️⃣ Also keep the Generate button
 if st.button("Generate"):
     generate()
-
-# 5️⃣ Display the generated text (if any)
-if "generated" in st.session_state:
-    st.subheader("🖋️ Generated Text")
-    st.write(st.session_state.generated)
