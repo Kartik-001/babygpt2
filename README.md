@@ -1,5 +1,5 @@
 # 🍼 BabyGPT2
-
+🧪 Try it live on [Streamlit](https://babygpt2.streamlit.app/)
 An end-to-end "ChatGPT-style" demo project built from scratch:
 
 - 🧠 **Train & experiment** with a miniature GPT-2 model (`BabyGPT`) using Colab
